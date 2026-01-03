@@ -34,6 +34,7 @@ RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 
 WORKDIR /var/www
 

@@ -92,22 +92,56 @@
           </svg>
         </button>
 
-        <button class="user-avatar" aria-label="User menu">
-          <img
-            src="https://i.pravatar.cc/100"
-            alt="User avatar"
-            width="32"
-            height="32"
-            loading="lazy"
-          />
-        </button>
+        <div class="auth-section">
+          <div v-if="isAuthenticated" class="user-section">
+            <span class="user-name">Olá, {{ user?.name }}</span>
+            <div class="user-menu">
+              <button class="user-avatar" @click.stop="toggleUserMenu" aria-label="Menu do usuário" :title="`Clique para abrir menu (${user?.name})`">
+                <img
+                  src="https://i.pravatar.cc/100"
+                  alt="Avatar do usuário"
+                  width="32"
+                  height="32"
+                  loading="lazy"
+                />
+              </button>
+              <div v-if="showUserMenu" class="user-dropdown" @click.stop>
+                <button @click="handleLogout" class="dropdown-item logout-item">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16,17 21,12 16,7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                  Sair da conta
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="auth-buttons">
+            <router-link to="/login" class="auth-btn login-btn">Entrar</router-link>
+            <router-link to="/register" class="auth-btn register-btn">Criar Conta</router-link>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+
+const router = useRouter()
+const { user, isAuthenticated, logout } = useAuth()
 
 const emit = defineEmits<{
   search: [query: string]
@@ -116,6 +150,7 @@ const emit = defineEmits<{
 const searchQuery = ref('')
 const searchActive = ref(false)
 const searchInputRef = ref<HTMLInputElement | null>(null)
+const showUserMenu = ref(false)
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
 const handleSearchInput = () => {
@@ -141,6 +176,30 @@ const handleSearchBlur = () => {
     }
   }, 200)
 }
+
+const toggleUserMenu = () => {
+  showUserMenu.value = !showUserMenu.value
+}
+
+const handleLogout = async () => {
+  showUserMenu.value = false
+  await logout()
+  router.push('/')
+}
+
+// Fechar dropdown quando clicar fora
+const closeDropdown = () => {
+  showUserMenu.value = false
+}
+
+onMounted(() => {
+  // Adicionar listener para fechar o dropdown ao clicar fora
+  document.addEventListener('click', closeDropdown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeDropdown)
+})
 </script>
 
 <style scoped>
@@ -296,6 +355,130 @@ const handleSearchBlur = () => {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background: none;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  padding: 0;
+}
+
+.user-avatar:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem;
+  min-width: 140px;
+  z-index: 9999;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  animation: dropdownFade 0.2s ease-out;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.logout-item:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.auth-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.login-btn {
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.login-btn:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.register-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.register-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
 .user-avatar {
   background: none;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -303,11 +486,13 @@ const handleSearchBlur = () => {
   padding: 0;
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .user-avatar:hover {
-  border-color: #fff;
+  border-color: #667eea;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.4);
 }
 
 .user-avatar img {

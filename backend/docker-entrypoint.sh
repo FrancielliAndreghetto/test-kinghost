@@ -40,4 +40,4 @@ echo "Laravel setup complete. Starting background services..."
 sleep 5
 
 echo "Starting PHP-FPM..."
-php-fpm
+exec php-fpm
