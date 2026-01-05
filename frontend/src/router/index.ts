@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
+import FavoritesView from '@/views/FavoritesView.vue'
 import { useAuth } from '@/composables/useAuth'
 
 const router = createRouter({
@@ -11,6 +12,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/login',
@@ -27,27 +29,48 @@ const router = createRouter({
     {
       path: '/tv-shows',
       name: 'tv-shows',
-      component: () => import('@/views/HomeView.vue'),
+      component: HomeView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/movies',
       name: 'movies',
-      component: () => import('@/views/HomeView.vue'),
+      component: HomeView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/new',
       name: 'new',
-      component: () => import('@/views/HomeView.vue'),
+      component: HomeView,
+      meta: { requiresAuth: true },
     },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: FavoritesView,
+      meta: { requiresAuth: true }
+    }
   ],
 })
 
 // Navigation guards
-router.beforeEach((to, from, next) => {
-  const { isAuthenticated } = useAuth()
+router.beforeEach(async (to, from, next) => {
+  const { isAuthenticated, isInitialized, initializeAuth } = useAuth()
   
+  // Aguarda a inicialização da autenticação na primeira navegação
+  if (!isInitialized.value) {
+    await initializeAuth()
+  }
+  
+  // Redireciona usuários autenticados tentando acessar login/register
   if (to.meta.requiresGuest && isAuthenticated.value) {
     next('/')
+    return
+  }
+  
+  // Redireciona usuários não autenticados tentando acessar rotas protegidas
+  if (to.meta.requiresAuth && !isAuthenticated.value) {
+    next('/login')
     return
   }
   

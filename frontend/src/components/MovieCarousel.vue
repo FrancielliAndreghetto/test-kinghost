@@ -2,20 +2,23 @@
   <section class="movie-carousel">
     <div class="carousel-header">
       <h2 class="carousel-title">{{ title }}</h2>
-      <button v-if="showFilter" class="filter-button" @click="$emit('toggleFilter')">
-        FILTERS
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-        </svg>
-      </button>
+      <div class="carousel-actions">
+        <slot name="action"></slot>
+        <button v-if="showFilter" class="filter-button" @click="$emit('toggleFilter')">
+          FILTERS
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="carousel-container" ref="carouselRef">
@@ -147,6 +150,12 @@ onUnmounted(() => {
   letter-spacing: 0.05em;
 }
 
+.carousel-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .filter-button {
   display: flex;
   align-items: center;
@@ -187,7 +196,7 @@ onUnmounted(() => {
 
 .carousel-track > :deep(*) {
   flex: 0 0 auto;
-  width: 200px;
+  width: 250px;
 }
 
 .nav-button {

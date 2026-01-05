@@ -32,36 +32,6 @@
             {{ genre }}
           </span>
         </div>
-
-        <div class="hero-actions">
-          <button class="btn btn-primary" @click="$emit('watch', movie.id)">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            WATCH
-          </button>
-          <button class="btn btn-secondary" @click="$emit('addToList', movie.id)">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            MY LIST
-          </button>
-        </div>
       </div>
     </div>
   </section>
@@ -107,7 +77,7 @@ const displayGenres = computed(() => props.genres.slice(0, 2))
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  margin-top: 80px;
+  margin-top: 70px;
   overflow: hidden;
 }
 

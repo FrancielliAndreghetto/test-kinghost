@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { useFavorites } from './useFavorites'
 
 interface User {
   id: number
@@ -32,6 +33,8 @@ const user = ref<User | null>(null)
 const token = ref<string | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
+const isInitialized = ref(false)
+const { fetchFavorites } = useFavorites()
 
 // Configure axios defaults
 axios.defaults.baseURL = 'http://localhost:8080'
@@ -54,14 +57,15 @@ export function useAuth() {
     delete axios.defaults.headers.common['Authorization']
   }
 
-  const initializeAuth = () => {
+  const initializeAuth = async () => {
     const savedToken = localStorage.getItem('auth_token')
     if (savedToken) {
       token.value = savedToken
       axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`
-      // Try to get user data
-      getCurrentUser()
+      // Try to get user data and favorites
+      await getCurrentUser()
     }
+    isInitialized.value = true
   }
 
   const getCurrentUser = async () => {
@@ -70,6 +74,9 @@ export function useAuth() {
     try {
       const response = await axios.get('/api/auth/me')
       user.value = response.data.user
+      // Carregar favoritos após obter dados do usuário
+      console.log('🔄 User restored from token, fetching favorites...')
+      await fetchFavorites()
     } catch (err) {
       clearAuth()
       console.error('Failed to get current user:', err)
@@ -86,10 +93,27 @@ export function useAuth() {
 
       user.value = userData
       setAuthToken(authToken)
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Login failed'
-      error.value = errorMessage
-      throw new Error(errorMessage)
+      console.log('🔐 User logged in, fetching favorites...')
+      await fetchFavorites()
+      console.log('✅ Login completed')
+    } catch (err) {
+      // Surface validation errors (422) or general messages
+      if ((err as any).response) {
+        if ((err as any).response.status === 422 && (err as any).response.data?.errors) {
+          // Join all validation messages into a single string
+          const errors = (err as any).response.data.errors
+          const messages = Object.values(errors).flat().join(' ')
+          error.value = messages
+          throw new Error(messages)
+        }
+
+        const errorMessage = (err as any).response.data?.message || 'Login failed'
+        error.value = errorMessage
+        throw new Error(errorMessage)
+      }
+
+      error.value = 'Login failed'
+      throw new Error('Login failed')
     } finally {
       loading.value = false
     }
@@ -106,9 +130,22 @@ export function useAuth() {
       user.value = userData
       setAuthToken(authToken)
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Registration failed'
-      error.value = errorMessage
-      throw new Error(errorMessage)
+      // Handle validation errors (422) specially so the UI can show them
+      if (err.response) {
+        if (err.response.status === 422 && err.response.data?.errors) {
+          const errors = err.response.data.errors
+          const messages = Object.values(errors).flat().join(' ')
+          error.value = messages
+          throw new Error(messages)
+        }
+
+        const errorMessage = err.response.data?.message || 'Registration failed'
+        error.value = errorMessage
+        throw new Error(errorMessage)
+      }
+
+      error.value = 'Registration failed'
+      throw new Error('Registration failed')
     } finally {
       loading.value = false
     }
@@ -128,19 +165,18 @@ export function useAuth() {
     }
   }
 
-  // Initialize auth on composable creation
-  initializeAuth()
-
   return {
     user: computed(() => user.value),
     token: computed(() => token.value),
     loading: computed(() => loading.value),
     error: computed(() => error.value),
     isAuthenticated,
+    isInitialized: computed(() => isInitialized.value),
     login,
     register,
     logout,
     getCurrentUser,
+    initializeAuth,
     clearAuth,
   }
 }

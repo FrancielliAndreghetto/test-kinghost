@@ -33,16 +33,10 @@ defineEmits<{
 <style scoped>
 .filter-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   padding: 0 2rem;
   margin-bottom: 1.5rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.filter-tabs::-webkit-scrollbar {
-  display: none;
 }
 
 .filter-tab {
@@ -63,12 +57,14 @@ defineEmits<{
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.9);
   border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .filter-tab.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
   border-color: transparent;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 @media (max-width: 768px) {

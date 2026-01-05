@@ -13,7 +13,17 @@ return new class extends Migration
     {
         Schema::create('favorites', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('movie_id');
+            $table->string('movie_title')->nullable();
+            $table->string('poster_path')->nullable();
+            $table->text('overview')->nullable();
+            $table->decimal('vote_average', 3, 1)->nullable();
+            $table->date('release_date')->nullable();
+            $table->json('genre_ids')->nullable();
             $table->timestamps();
+
+            $table->unique(['user_id', 'movie_id']);
         });
     }
 

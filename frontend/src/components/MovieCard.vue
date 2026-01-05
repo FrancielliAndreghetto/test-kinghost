@@ -1,17 +1,23 @@
 <template>
-  <article class="movie-card" @click="$emit('click', movie.id)">
-    <div class="card-image">
+  <article class="movie-card">
+    <div class="card-image" @click="$emit('click', movie.id)">
       <img :src="posterUrl" :alt="movie.title" loading="lazy" />
       <div class="card-overlay">
-        <button class="play-button" aria-label="Play movie">
+        <button class="info-button" @click.stop="openModal" aria-label="Info movie">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
             height="32"
             viewBox="0 0 24 24"
-            fill="currentColor"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
           >
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
           </svg>
         </button>
       </div>
@@ -36,13 +42,13 @@
           {{ movie.vote_average.toFixed(1) }}
         </span>
 
-        <button class="favorite-button" @click.stop="toggleFavorite" :aria-label="favoriteLabel">
+        <button class="favorite-button" @click.stop="handleToggleFavorite" :aria-label="favoriteLabel">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
             height="16"
             viewBox="0 0 24 24"
-            :fill="isFavorite ? 'currentColor' : 'none'"
+            :fill="isFavorite(movie.id) ? 'currentColor' : 'none'"
             stroke="currentColor"
             stroke-width="2"
           >
@@ -53,13 +59,22 @@
         </button>
       </div>
     </div>
+
+    <MovieModal 
+      :movie="movie" 
+      :is-open="isModalOpen" 
+      @close="closeModal"
+      @watch="handleWatch"
+    />
   </article>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useFavorites } from '@/composables/useFavorites'
 import type { Movie } from '@/types/movie'
 import { getImageUrl, IMAGE_SIZES } from '@/config/api'
+import MovieModal from './MovieModal.vue'
 
 interface Props {
   movie: Movie
@@ -71,16 +86,35 @@ defineEmits<{
   click: [movieId: number]
 }>()
 
-const isFavorite = ref(false)
+const { isFavorite, toggleFavorite } = useFavorites()
+
+const isModalOpen = ref(false)
 
 const posterUrl = computed(() => getImageUrl(props.movie.poster_path, IMAGE_SIZES.POSTER_MEDIUM))
 
 const favoriteLabel = computed(() =>
-  isFavorite.value ? 'Remove from favorites' : 'Add to favorites',
+  isFavorite(props.movie.id) ? 'Remove from favorites' : 'Add to favorites',
 )
 
-const toggleFavorite = () => {
-  isFavorite.value = !isFavorite.value
+const openModal = () => {
+  isModalOpen.value = true
+}
+
+const closeModal = () => {
+  isModalOpen.value = false
+}
+
+const handleWatch = (movieId: number) => {
+  console.log('Watch movie:', movieId)
+  closeModal()
+}
+
+const handleToggleFavorite = async () => {
+  try {
+    await toggleFavorite(props.movie)
+  } catch (err) {
+    console.error('Failed to toggle favorite:', err)
+  }
 }
 </script>
 
@@ -130,7 +164,7 @@ const toggleFavorite = () => {
   opacity: 1;
 }
 
-.play-button {
+.info-button {
   background: rgba(255, 255, 255, 0.95);
   color: #000;
   border: none;
@@ -144,7 +178,7 @@ const toggleFavorite = () => {
   transition: all 0.3s ease;
 }
 
-.play-button:hover {
+.info-button:hover {
   transform: scale(1.1);
   background: #fff;
 }

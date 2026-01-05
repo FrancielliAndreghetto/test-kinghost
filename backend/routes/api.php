@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\MovieController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Debug route to check users in database
 Route::get('/debug/users', function () {
     return response()->json([
         'total_users' => User::count(),
@@ -35,5 +35,11 @@ Route::prefix('movies')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
+    });
+    Route::prefix('favorites')->group(function () {
+        Route::get('/', [FavoriteController::class, 'index']);
+        Route::post('/', [FavoriteController::class, 'store']);
+        Route::delete('/{movieId}', [FavoriteController::class, 'destroy']);
+        Route::get('/check/{movieId}', [FavoriteController::class, 'check']);
     });
 });

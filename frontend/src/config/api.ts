@@ -15,7 +15,7 @@ export const IMAGE_SIZES = {
 } as const
 
 export const getImageUrl = (
-  path: string | null,
+  path: string | null | undefined,
   size: string = IMAGE_SIZES.POSTER_LARGE,
 ): string => {
   if (!path) return API_CONFIG.PLACEHOLDER_IMAGE
@@ -23,7 +23,7 @@ export const getImageUrl = (
 }
 
 export const getBackdropUrl = (
-  path: string | null,
+  path: string | null | undefined,
   size: string = IMAGE_SIZES.BACKDROP_LARGE,
 ): string => {
   if (!path) return API_CONFIG.PLACEHOLDER_IMAGE

@@ -3,14 +3,12 @@
     <div class="header-container">
       <div class="header-left">
         <router-link to="/" class="logo">
-          <span class="logo-text">DRAMATIC</span>
+          <span class="logo-text">KINGHOST</span>
         </router-link>
 
         <nav class="main-nav" aria-label="Main navigation">
-          <router-link to="/" class="nav-link" active-class="active">HOME</router-link>
-          <router-link to="/tv-shows" class="nav-link" active-class="active"> TV SHOW </router-link>
-          <router-link to="/movies" class="nav-link" active-class="active">MOVIES</router-link>
-          <router-link to="/new" class="nav-link" active-class="active">NEW</router-link>
+          <router-link to="/" class="nav-link" active-class="active">Início</router-link>
+          <router-link to="/favorites" class="nav-link" active-class="active">Favoritos </router-link>
         </nav>
       </div>
 
@@ -59,38 +57,6 @@
             </svg>
           </button>
         </div>
-
-        <button class="icon-button" aria-label="Grid view">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-        </button>
-
-        <button class="icon-button" aria-label="Notifications">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-        </button>
 
         <div class="auth-section">
           <div v-if="isAuthenticated" class="user-section">

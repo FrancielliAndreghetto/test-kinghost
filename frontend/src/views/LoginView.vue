@@ -3,7 +3,7 @@
     <div class="auth-container">
       <div class="auth-header">
         <router-link to="/" class="logo">
-          <span class="logo-text">DRAMATIC</span>
+          <span class="logo-text">KINGHOST</span>
         </router-link>
       </div>
 

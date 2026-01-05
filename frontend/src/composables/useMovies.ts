@@ -1,144 +1,91 @@
 import { ref } from 'vue'
 import type { Movie, MoviesResponse, Genre } from '@/types/movie'
-import { API_CONFIG } from '@/config/api'
+import { movieService } from '@/services/movieService'
+import { errorHandler } from '@/utils/errorHandler'
 
+/**
+ * Movies Composable
+ * Manages movie-related state and operations
+ * Following Composition API pattern and Single Responsibility
+ */
 export function useMovies() {
   const movies = ref<Movie[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  const searchMovies = async (query: string): Promise<void> => {
-    if (!query.trim()) return
-
+  /**
+   * Base method for handling service calls - DRY principle
+   */
+  const handleServiceCall = async <T>(
+    serviceCall: () => Promise<T>,
+    errorMessage: string,
+  ): Promise<T | null> => {
     loading.value = true
     error.value = null
 
     try {
-      const response = await fetch(
-        `${API_CONFIG.BASE_URL}/movies/search?query=${encodeURIComponent(query)}`,
-      )
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar filmes')
-      }
-
-      const data: MoviesResponse = await response.json()
-      movies.value = data.results || []
+      return await serviceCall()
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Erro desconhecido'
-      console.error('Erro ao buscar filmes:', err)
+      const message = err instanceof Error ? err.message : errorMessage
+      error.value = message
+      errorHandler.handle(message, 'useMovies')
+      throw err
     } finally {
       loading.value = false
     }
+  }
+
+  const searchMovies = async (query: string, page: number = 1): Promise<MoviesResponse> => {
+    const result = await handleServiceCall(
+      () => movieService.searchMovies(query, page),
+      'Erro ao buscar filmes',
+    )
+    
+    if (result) {
+      movies.value = result.results || []
+      return result
+    }
+    
+    return { results: [], page: 1, total_pages: 1, total_results: 0 }
   }
 
   const getPopularMovies = async (page: number = 1): Promise<Movie[]> => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/movies/popular?page=${page}`)
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar filmes populares')
-      }
-
-      const data: MoviesResponse = await response.json()
-      return data.results || []
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Erro desconhecido'
-      console.error('Erro ao buscar filmes populares:', err)
-      return []
-    } finally {
-      loading.value = false
-    }
+    const result = await handleServiceCall(
+      () => movieService.getPopular(page),
+      'Erro ao buscar filmes populares',
+    )
+    return result?.results || []
   }
 
   const getNowPlayingMovies = async (page: number = 1): Promise<Movie[]> => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/movies/now-playing?page=${page}`)
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar filmes em cartaz')
-      }
-
-      const data: MoviesResponse = await response.json()
-      return data.results || []
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Erro desconhecido'
-      console.error('Erro ao buscar filmes em cartaz:', err)
-      return []
-    } finally {
-      loading.value = false
-    }
+    const result = await handleServiceCall(
+      () => movieService.getNowPlaying(page),
+      'Erro ao buscar filmes em cartaz',
+    )
+    return result?.results || []
   }
 
   const getUpcomingMovies = async (page: number = 1): Promise<Movie[]> => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/movies/upcoming?page=${page}`)
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar próximos lançamentos')
-      }
-
-      const data: MoviesResponse = await response.json()
-      return data.results || []
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Erro desconhecido'
-      console.error('Erro ao buscar próximos lançamentos:', err)
-      return []
-    } finally {
-      loading.value = false
-    }
+    const result = await handleServiceCall(
+      () => movieService.getUpcoming(page),
+      'Erro ao buscar próximos lançamentos',
+    )
+    return result?.results || []
   }
 
-  const getTopRatedMovies = async (page: number = 1): Promise<Movie[]> => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/movies/top-rated?page=${page}`)
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar filmes mais bem avaliados')
-      }
-
-      const data: MoviesResponse = await response.json()
-      return data.results || []
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Erro desconhecido'
-      console.error('Erro ao buscar filmes mais bem avaliados:', err)
-      return []
-    } finally {
-      loading.value = false
-    }
+  const getTopRatedMovies = async (page: number = 1): Promise<MoviesResponse> => {
+    const result = await handleServiceCall(
+      () => movieService.getTopRated(page),
+      'Erro ao buscar filmes mais bem avaliados',
+    )
+    return result || { results: [], page: 1, total_pages: 1, total_results: 0 }
   }
 
   const getMovieById = async (id: number): Promise<Movie | null> => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/movies/${id}`)
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar detalhes do filme')
-      }
-
-      return await response.json()
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Erro desconhecido'
-      console.error('Erro ao buscar filme:', err)
-      return null
-    } finally {
-      loading.value = false
-    }
+    return await handleServiceCall(
+      () => movieService.getById(id),
+      'Erro ao buscar detalhes do filme',
+    )
   }
 
   return {
@@ -154,6 +101,10 @@ export function useMovies() {
   }
 }
 
+/**
+ * Genres Composable
+ * Manages genre-related state and operations
+ */
 export function useGenres() {
   const genres = ref<Genre[]>([])
   const loading = ref(false)
@@ -164,17 +115,11 @@ export function useGenres() {
     error.value = null
 
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/movies/genres`)
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar gêneros')
-      }
-
-      const data = await response.json()
-      genres.value = data.genres || []
+      genres.value = await movieService.getGenres()
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Erro desconhecido'
-      console.error('Erro ao buscar gêneros:', err)
+      const message = err instanceof Error ? err.message : 'Erro ao buscar gêneros'
+      error.value = message
+      errorHandler.handle(message, 'useGenres')
     } finally {
       loading.value = false
     }
