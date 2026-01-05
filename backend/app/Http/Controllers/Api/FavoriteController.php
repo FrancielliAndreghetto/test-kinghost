@@ -4,81 +4,63 @@ namespace App\Http\Controllers\Api;
 
 use App\Contracts\Services\FavoriteServiceInterface;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreFavoriteRequest;
+use App\Http\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FavoriteController extends Controller
 {
+    use ApiResponseTrait;
+
     public function __construct(
         private readonly FavoriteServiceInterface $favoriteService
     ) {}
 
     public function index(Request $request): JsonResponse
     {
-        $favorites = $this->favoriteService->getUserFavorites($request->user());
+        $favorites = $this->favoriteService->getUserFavorites($request->user()->id);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse([
             'favorites' => $favorites,
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreFavoriteRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'movie_id' => 'required|integer',
-            'movie_title' => 'required|string',
-            'poster_path' => 'nullable|string',
-            'overview' => 'nullable|string',
-            'vote_average' => 'nullable|numeric',
-            'release_date' => 'nullable|date',
-            'genre_ids' => 'nullable|array',
-        ]);
-
         try {
-            $favorite = $this->favoriteService->addFavorite($request->user(), $validated);
+            $favorite = $this->favoriteService->addFavorite(
+                $request->user()->id,
+                $request->validated()
+            );
 
-            return response()->json([
-                'success' => true,
+            return $this->successResponse([
                 'favorite' => $favorite,
                 'message' => 'Movie added to favorites',
             ], 201);
         } catch (\DomainException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 409);
-        } catch (\InvalidArgumentException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 422);
+            return $this->errorResponse($e->getMessage(), 409);
         }
     }
 
     public function destroy(Request $request, int $movieId): JsonResponse
     {
         try {
-            $this->favoriteService->removeFavorite($request->user(), $movieId);
+            $this->favoriteService->removeFavorite($request->user()->id, $movieId);
 
-            return response()->json([
-                'success' => true,
+            return $this->successResponse([
                 'message' => 'Movie removed from favorites',
             ]);
         } catch (\DomainException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 404);
+            return $this->errorResponse($e->getMessage(), 404);
         }
     }
 
     public function check(Request $request, int $movieId): JsonResponse
     {
-        $isFavorite = $this->favoriteService->isFavorite($request->user(), $movieId);
+        $isFavorite = $this->favoriteService->isFavorite($request->user()->id, $movieId);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse([
             'is_favorite' => $isFavorite,
         ]);
     }

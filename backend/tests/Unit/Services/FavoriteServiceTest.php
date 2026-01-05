@@ -27,7 +27,7 @@ class FavoriteServiceTest extends TestCase
     {
         Favorite::factory()->count(3)->create(['user_id' => $this->user->id]);
 
-        $favorites = $this->service->getUserFavorites($this->user);
+        $favorites = $this->service->getUserFavorites($this->user->id);
 
         $this->assertCount(3, $favorites);
     }
@@ -44,7 +44,7 @@ class FavoriteServiceTest extends TestCase
             'genre_ids' => [1, 2, 3],
         ];
 
-        $favorite = $this->service->addFavorite($this->user, $movieData);
+        $favorite = $this->service->addFavorite($this->user->id, $movieData);
 
         $this->assertNotNull($favorite);
         $this->assertEquals(123, $favorite->movie_id);
@@ -74,31 +74,7 @@ class FavoriteServiceTest extends TestCase
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('Movie already in favorites');
 
-        $this->service->addFavorite($this->user, $movieData);
-    }
-
-    public function test_validates_required_movie_id(): void
-    {
-        $movieData = [
-            'movie_title' => 'Test Movie',
-        ];
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('movie_id is required');
-
-        $this->service->addFavorite($this->user, $movieData);
-    }
-
-    public function test_validates_required_movie_title(): void
-    {
-        $movieData = [
-            'movie_id' => 123,
-        ];
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('movie_title is required');
-
-        $this->service->addFavorite($this->user, $movieData);
+        $this->service->addFavorite($this->user->id, $movieData);
     }
 
     public function test_can_remove_favorite(): void
@@ -108,7 +84,7 @@ class FavoriteServiceTest extends TestCase
             'movie_id' => 123,
         ]);
 
-        $result = $this->service->removeFavorite($this->user, 123);
+        $result = $this->service->removeFavorite($this->user->id, 123);
 
         $this->assertTrue($result);
         $this->assertDatabaseMissing('favorites', [
@@ -122,7 +98,7 @@ class FavoriteServiceTest extends TestCase
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('Movie not found in favorites');
 
-        $this->service->removeFavorite($this->user, 999);
+        $this->service->removeFavorite($this->user->id, 999);
     }
 
     public function test_can_check_if_movie_is_favorite(): void
@@ -132,8 +108,8 @@ class FavoriteServiceTest extends TestCase
             'movie_id' => 123,
         ]);
 
-        $isFavorite = $this->service->isFavorite($this->user, 123);
-        $isNotFavorite = $this->service->isFavorite($this->user, 999);
+        $isFavorite = $this->service->isFavorite($this->user->id, 123);
+        $isNotFavorite = $this->service->isFavorite($this->user->id, 999);
 
         $this->assertTrue($isFavorite);
         $this->assertFalse($isNotFavorite);

@@ -4,40 +4,42 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\FavoriteRepositoryInterface;
 use App\Models\Favorite;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
 class EloquentFavoriteRepository implements FavoriteRepositoryInterface
 {
-    public function getUserFavorites(User $user): Collection
+    public function getUserFavorites(int $userId): Collection
     {
-        return $user->favorites()
+        return Favorite::where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get();
     }
 
-    public function create(User $user, array $data): Favorite
+    public function create(int $userId, array $data): Favorite
     {
-        return $user->favorites()->create($data);
+        return Favorite::create([
+            'user_id' => $userId,
+            ...$data,
+        ]);
     }
 
-    public function deleteByMovieId(User $user, int $movieId): bool
+    public function deleteByMovieId(int $userId, int $movieId): bool
     {
-        return $user->favorites()
+        return Favorite::where('user_id', $userId)
             ->where('movie_id', $movieId)
             ->delete() > 0;
     }
 
-    public function isFavorite(User $user, int $movieId): bool
+    public function isFavorite(int $userId, int $movieId): bool
     {
-        return $user->favorites()
+        return Favorite::where('user_id', $userId)
             ->where('movie_id', $movieId)
             ->exists();
     }
 
-    public function findByMovieId(User $user, int $movieId): ?Favorite
+    public function findByMovieId(int $userId, int $movieId): ?Favorite
     {
-        return $user->favorites()
+        return Favorite::where('user_id', $userId)
             ->where('movie_id', $movieId)
             ->first();
     }

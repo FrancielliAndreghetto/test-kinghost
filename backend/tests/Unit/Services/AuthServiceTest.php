@@ -86,6 +86,7 @@ class AuthServiceTest extends TestCase
 
     public function test_can_get_authenticated_user(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -97,6 +98,7 @@ class AuthServiceTest extends TestCase
 
     public function test_can_logout_user(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
         $this->actingAs($user);
         $user->createToken('test-token');

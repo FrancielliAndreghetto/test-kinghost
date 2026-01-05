@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Contracts\Repositories\FavoriteRepositoryInterface;
 use App\Contracts\Services\FavoriteServiceInterface;
 use App\Models\Favorite;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
 class FavoriteService implements FavoriteServiceInterface
@@ -14,44 +13,31 @@ class FavoriteService implements FavoriteServiceInterface
         private readonly FavoriteRepositoryInterface $favoriteRepository
     ) {}
 
-    public function getUserFavorites(User $user): Collection
+    public function getUserFavorites(int $userId): Collection
     {
-        return $this->favoriteRepository->getUserFavorites($user);
+        return $this->favoriteRepository->getUserFavorites($userId);
     }
 
-    public function addFavorite(User $user, array $movieData): Favorite
+    public function addFavorite(int $userId, array $movieData): Favorite
     {
-        $this->validateMovieData($movieData);
-
-        if ($this->favoriteRepository->isFavorite($user, $movieData['movie_id'])) {
+        if ($this->favoriteRepository->isFavorite($userId, $movieData['movie_id'])) {
             throw new \DomainException('Movie already in favorites');
         }
 
-        return $this->favoriteRepository->create($user, $movieData);
+        return $this->favoriteRepository->create($userId, $movieData);
     }
 
-    public function removeFavorite(User $user, int $movieId): bool
+    public function removeFavorite(int $userId, int $movieId): bool
     {
-        if (!$this->favoriteRepository->isFavorite($user, $movieId)) {
+        if (!$this->favoriteRepository->isFavorite($userId, $movieId)) {
             throw new \DomainException('Movie not found in favorites');
         }
 
-        return $this->favoriteRepository->deleteByMovieId($user, $movieId);
+        return $this->favoriteRepository->deleteByMovieId($userId, $movieId);
     }
 
-    public function isFavorite(User $user, int $movieId): bool
+    public function isFavorite(int $userId, int $movieId): bool
     {
-        return $this->favoriteRepository->isFavorite($user, $movieId);
-    }
-
-    private function validateMovieData(array $data): void
-    {
-        $required = ['movie_id', 'movie_title'];
-        
-        foreach ($required as $field) {
-            if (!isset($data[$field]) || empty($data[$field])) {
-                throw new \InvalidArgumentException("Field {$field} is required");
-            }
-        }
+        return $this->favoriteRepository->isFavorite($userId, $movieId);
     }
 }

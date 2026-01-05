@@ -60,7 +60,15 @@ class AuthService implements AuthServiceInterface
 
     public function logout(): bool
     {
-        Auth::user()?->currentAccessToken()?->delete();
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        
+        if ($user) {
+            /** @var \Laravel\Sanctum\PersonalAccessToken|null $token */
+            $token = $user->currentAccessToken();
+            $token?->delete();
+        }
+        
         return true;
     }
 }

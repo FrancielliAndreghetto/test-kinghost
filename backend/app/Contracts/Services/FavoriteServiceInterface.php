@@ -3,16 +3,15 @@
 namespace App\Contracts\Services;
 
 use App\Models\Favorite;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
 interface FavoriteServiceInterface
 {
-    public function getUserFavorites(User $user): Collection;
+    public function getUserFavorites(int $userId): Collection;
 
-    public function addFavorite(User $user, array $movieData): Favorite;
+    public function addFavorite(int $userId, array $movieData): Favorite;
 
-    public function removeFavorite(User $user, int $movieId): bool;
+    public function removeFavorite(int $userId, int $movieId): bool;
 
-    public function isFavorite(User $user, int $movieId): bool;
+    public function isFavorite(int $userId, int $movieId): bool;
 }

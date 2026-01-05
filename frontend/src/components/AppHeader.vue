@@ -103,10 +103,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
-const router = useRouter()
 const { user, isAuthenticated, logout } = useAuth()
 
 const emit = defineEmits<{
@@ -150,7 +148,6 @@ const toggleUserMenu = () => {
 const handleLogout = async () => {
   showUserMenu.value = false
   await logout()
-  router.push('/')
 }
 
 // Fechar dropdown quando clicar fora

@@ -26,7 +26,7 @@ class EloquentFavoriteRepositoryTest extends TestCase
     {
         Favorite::factory()->count(3)->create(['user_id' => $this->user->id]);
 
-        $favorites = $this->repository->getUserFavorites($this->user);
+        $favorites = $this->repository->getUserFavorites($this->user->id);
 
         $this->assertCount(3, $favorites);
     }
@@ -46,7 +46,7 @@ class EloquentFavoriteRepositoryTest extends TestCase
             'created_at' => now(),
         ]);
 
-        $favorites = $this->repository->getUserFavorites($this->user);
+        $favorites = $this->repository->getUserFavorites($this->user->id);
 
         $this->assertEquals($favorite3->id, $favorites->first()->id);
         $this->assertEquals($favorite1->id, $favorites->last()->id);
@@ -64,7 +64,7 @@ class EloquentFavoriteRepositoryTest extends TestCase
             'genre_ids' => json_encode([1, 2, 3]),
         ];
 
-        $favorite = $this->repository->create($this->user, $data);
+        $favorite = $this->repository->create($this->user->id, $data);
 
         $this->assertNotNull($favorite);
         $this->assertEquals(123, $favorite->movie_id);
@@ -82,7 +82,7 @@ class EloquentFavoriteRepositoryTest extends TestCase
             'movie_id' => 123,
         ]);
 
-        $result = $this->repository->deleteByMovieId($this->user, 123);
+        $result = $this->repository->deleteByMovieId($this->user->id, 123);
 
         $this->assertTrue($result);
         $this->assertDatabaseMissing('favorites', [
@@ -93,7 +93,7 @@ class EloquentFavoriteRepositoryTest extends TestCase
 
     public function test_returns_false_when_deleting_nonexistent_favorite(): void
     {
-        $result = $this->repository->deleteByMovieId($this->user, 999);
+        $result = $this->repository->deleteByMovieId($this->user->id, 999);
 
         $this->assertFalse($result);
     }
@@ -105,8 +105,8 @@ class EloquentFavoriteRepositoryTest extends TestCase
             'movie_id' => 123,
         ]);
 
-        $isFavorite = $this->repository->isFavorite($this->user, 123);
-        $isNotFavorite = $this->repository->isFavorite($this->user, 999);
+        $isFavorite = $this->repository->isFavorite($this->user->id, 123);
+        $isNotFavorite = $this->repository->isFavorite($this->user->id, 999);
 
         $this->assertTrue($isFavorite);
         $this->assertFalse($isNotFavorite);
@@ -119,7 +119,7 @@ class EloquentFavoriteRepositoryTest extends TestCase
             'movie_id' => 123,
         ]);
 
-        $found = $this->repository->findByMovieId($this->user, 123);
+        $found = $this->repository->findByMovieId($this->user->id, 123);
 
         $this->assertNotNull($found);
         $this->assertEquals($favorite->id, $found->id);
@@ -127,7 +127,7 @@ class EloquentFavoriteRepositoryTest extends TestCase
 
     public function test_returns_null_when_favorite_not_found(): void
     {
-        $found = $this->repository->findByMovieId($this->user, 999);
+        $found = $this->repository->findByMovieId($this->user->id, 999);
 
         $this->assertNull($found);
     }
@@ -145,7 +145,7 @@ class EloquentFavoriteRepositoryTest extends TestCase
             'movie_id' => 456,
         ]);
 
-        $userFavorites = $this->repository->getUserFavorites($this->user);
+        $userFavorites = $this->repository->getUserFavorites($this->user->id);
 
         $this->assertCount(1, $userFavorites);
         $this->assertEquals(123, $userFavorites->first()->movie_id);

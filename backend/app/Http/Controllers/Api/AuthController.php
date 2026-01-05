@@ -5,89 +5,64 @@ namespace App\Http\Controllers\Api;
 use App\Contracts\Services\AuthServiceInterface;
 use App\Exceptions\AuthException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    use ApiResponseTrait;
+
     public function __construct(
         private readonly AuthServiceInterface $authService
     ) {}
 
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
         try {
             $result = $this->authService->register(
-                $validated['name'],
-                $validated['email'],
-                $validated['password']
+                $request->validated('name'),
+                $request->validated('email'),
+                $request->validated('password')
             );
 
-            return response()->json([
-                'success' => true,
+            return $this->successResponse([
                 'user' => $result['user'],
                 'token' => $result['token'],
                 'token_type' => $result['token_type'],
             ], 201);
         } catch (AuthException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], $e->getCode());
+            return $this->errorResponse($e->getMessage(), $e->getCode());
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Registration failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return $this->errorResponse('Registration failed', 500);
         }
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
-
         try {
             $result = $this->authService->login(
-                $validated['email'],
-                $validated['password']
+                $request->validated('email'),
+                $request->validated('password')
             );
 
-            return response()->json([
-                'success' => true,
+            return $this->successResponse([
                 'user' => $result['user'],
                 'token' => $result['token'],
                 'token_type' => $result['token_type'],
             ]);
         } catch (AuthException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], $e->getCode());
+            return $this->errorResponse($e->getMessage(), $e->getCode());
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Login failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return $this->errorResponse('Login failed', 500);
         }
     }
 
-
     public function me(Request $request): JsonResponse
     {
-        return response()->json([
-            'success' => true,
+        return $this->successResponse([
             'user' => $request->user(),
         ]);
     }
@@ -97,15 +72,11 @@ class AuthController extends Controller
         try {
             $this->authService->logout();
 
-            return response()->json([
-                'success' => true,
+            return $this->successResponse([
                 'message' => 'Logged out successfully',
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Logout failed',
-            ], 500);
+            return $this->errorResponse('Logout failed', 500);
         }
     }
 }

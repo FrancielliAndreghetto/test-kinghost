@@ -61,7 +61,7 @@
     </div>
 
     <MovieModal 
-      :movie="movie" 
+      :movie="movieWithFavoriteData" 
       :is-open="isModalOpen" 
       @close="closeModal"
       @watch="handleWatch"
@@ -86,7 +86,7 @@ defineEmits<{
   click: [movieId: number]
 }>()
 
-const { isFavorite, toggleFavorite } = useFavorites()
+const { isFavorite, toggleFavorite, favorites } = useFavorites()
 
 const isModalOpen = ref(false)
 
@@ -95,6 +95,18 @@ const posterUrl = computed(() => getImageUrl(props.movie.poster_path, IMAGE_SIZE
 const favoriteLabel = computed(() =>
   isFavorite(props.movie.id) ? 'Remove from favorites' : 'Add to favorites',
 )
+
+// Merge movie with favorite data if exists
+const movieWithFavoriteData = computed(() => {
+  const favorite = favorites.value.find(f => f.movie_id === props.movie.id)
+  if (favorite && favorite.backdrop_path) {
+    return {
+      ...props.movie,
+      backdrop_path: favorite.backdrop_path
+    }
+  }
+  return props.movie
+})
 
 const openModal = () => {
   isModalOpen.value = true

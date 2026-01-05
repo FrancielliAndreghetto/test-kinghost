@@ -7,6 +7,7 @@ export interface Favorite {
   movie_id: number
   movie_title: string
   poster_path: string | null
+  backdrop_path: string | null
   overview: string | null
   vote_average: number | null
   release_date: string | null
@@ -39,7 +40,8 @@ export class FavoriteService {
     const payload = {
       movie_id: movie.id,
       movie_title: movie.title,
-      poster_path: movie.poster_path ?? '',
+      poster_path: movie.poster_path,
+      backdrop_path: movie.backdrop_path,
       overview: movie.overview ?? '',
       vote_average: movie.vote_average,
       release_date: movie.release_date,

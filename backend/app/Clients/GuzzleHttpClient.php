@@ -4,7 +4,6 @@ namespace App\Clients;
 
 use App\Contracts\Clients\HttpClientInterface;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Client\ConnectionException;
 
 class GuzzleHttpClient implements HttpClientInterface
 {
@@ -17,6 +16,7 @@ class GuzzleHttpClient implements HttpClientInterface
 
     public function get(string $url, array $params = []): array
     {
+        /** @var \Illuminate\Http\Client\Response $response */
         $response = Http::timeout($this->timeout)
             ->get($url, $params);
 
@@ -31,6 +31,7 @@ class GuzzleHttpClient implements HttpClientInterface
 
     public function post(string $url, array $data = []): array
     {
+        /** @var \Illuminate\Http\Client\Response $response */
         $response = Http::timeout($this->timeout)
             ->post($url, $data);
 

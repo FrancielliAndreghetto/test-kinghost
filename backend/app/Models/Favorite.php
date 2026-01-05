@@ -15,6 +15,7 @@ class Favorite extends Model
         'movie_id',
         'movie_title',
         'poster_path',
+        'backdrop_path',
         'overview',
         'vote_average',
         'release_date',

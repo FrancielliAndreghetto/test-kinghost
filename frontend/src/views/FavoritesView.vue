@@ -138,6 +138,7 @@ interface Favorite {
   movie_id: number
   movie_title: string
   poster_path: string | null
+  backdrop_path: string | null
   overview: string | null
   vote_average: number | null
   release_date: string | null
@@ -220,22 +221,25 @@ const handleMovieClick = (movieId: number) => {
   console.log('Movie clicked:', movieId)
 }
 
-const convertToMovie = (favorite: Favorite): Movie => ({
-  id: favorite.movie_id,
-  title: favorite.movie_title,
-  poster_path: favorite.poster_path,
-  overview: favorite.overview || '',
-  vote_average: favorite.vote_average || 0,
-  release_date: favorite.release_date || '',
-  backdrop_path: null,
-  genre_ids: favorite.genre_ids || [],
-  original_language: '',
-  original_title: favorite.movie_title,
-  popularity: 0,
-  video: false,
-  adult: false,
-  vote_count: 0,
-})
+const convertToMovie = (favorite: Favorite): Movie => {
+  console.log('Converting favorite to movie:', favorite.movie_title, 'backdrop_path:', favorite.backdrop_path)
+  return {
+    id: favorite.movie_id,
+    title: favorite.movie_title,
+    poster_path: favorite.poster_path,
+    overview: favorite.overview || '',
+    vote_average: favorite.vote_average || 0,
+    release_date: favorite.release_date || '',
+    backdrop_path: favorite.backdrop_path,
+    genre_ids: favorite.genre_ids || [],
+    original_language: '',
+    original_title: favorite.movie_title,
+    popularity: 0,
+    video: false,
+    adult: false,
+    vote_count: 0,
+  }
+}
 </script>
 
 <style scoped>

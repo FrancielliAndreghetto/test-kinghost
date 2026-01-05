@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useFavorites } from '@/composables/useFavorites'
 import type { Movie } from '@/types/movie'
 import { getImageUrl, IMAGE_SIZES } from '@/config/api'
@@ -108,9 +108,20 @@ const emit = defineEmits<{
 const { isFavorite, toggleFavorite } = useFavorites()
 const imageLoading = ref(true)
 
-const backdropUrl = computed(() =>
-  getImageUrl(props.movie.backdrop_path, IMAGE_SIZES.BACKDROP_LARGE),
-)
+// Reset imageLoading quando o modal abre
+watch(() => props.isOpen, (newValue) => {
+  if (newValue) {
+    imageLoading.value = true
+    console.log('Modal opened - Movie:', props.movie.title)
+    console.log('Backdrop path:', props.movie.backdrop_path)
+    console.log('Backdrop URL:', backdropUrl.value)
+  }
+})
+
+const backdropUrl = computed(() => {
+  if (!props.movie.backdrop_path) return ''
+  return getImageUrl(props.movie.backdrop_path, IMAGE_SIZES.BACKDROP_LARGE)
+})
 
 const imageLoaded = computed(() => !imageLoading.value)
 
@@ -142,8 +153,7 @@ const handleToggleFavorite = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,7 +179,7 @@ const handleToggleFavorite = async () => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.8);
   border: none;
   color: #fff;
   cursor: pointer;
@@ -178,7 +188,6 @@ const handleToggleFavorite = async () => {
   justify-content: center;
   z-index: 10;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
 }
 
 .modal-close:hover {
