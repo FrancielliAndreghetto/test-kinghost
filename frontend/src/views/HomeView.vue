@@ -168,7 +168,7 @@ interface Favorite {
 
 const {
   movies,
-  loading,
+  loading: _loading,
   error,
   searchMovies,
   getPopularMovies,
@@ -205,7 +205,7 @@ const mapFavoriteToMovie = (favorite: Favorite): Movie => ({
   video: false,
 })
 
-const selectedLanguage = ref('Todos')
+const selectedLanguage = ref('todos')
 const popularMovies = ref<Movie[]>([])
 const nowPlayingMovies = ref<Movie[]>([])
 const topRatedMovies = ref<Movie[]>([])
@@ -239,12 +239,12 @@ const featuredMovie = computed(() => {
   return popularMovies.value.length > 0 ? popularMovies.value[0] : null
 })
 
-const mustWatchMovies = computed(() => {
+const _mustWatchMovies = computed(() => {
   return nowPlayingMovies.value.slice(0, 10)
 })
 
 const recommendedMovies = computed(() => {
-  if (selectedLanguage.value === 'Todos') {
+  if (selectedLanguage.value === 'todos') {
     return allTopRatedMovies.value
   }
   const genreId = parseInt(selectedLanguage.value)

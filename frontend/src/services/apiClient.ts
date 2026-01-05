@@ -14,7 +14,6 @@ class ApiClient {
       },
     })
 
-    // Request interceptor
     this.client.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('auth_token')
@@ -29,17 +28,14 @@ class ApiClient {
       },
     )
 
-    // Response interceptor
     this.client.interceptors.response.use(
       (response) => response,
       (error) => {
-        // Handle 401 Unauthorized
         if (error.response?.status === 401) {
           localStorage.removeItem('auth_token')
           window.location.href = '/login'
         }
 
-        // Log error
         errorHandler.handle(
           error.response?.data?.message || error.message || 'Request failed',
           'API Response',
@@ -55,12 +51,12 @@ class ApiClient {
     return response.data
   }
 
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response: AxiosResponse<T> = await this.client.post(url, data, config)
     return response.data
   }
 
-  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response: AxiosResponse<T> = await this.client.put(url, data, config)
     return response.data
   }
@@ -70,11 +66,10 @@ class ApiClient {
     return response.data
   }
 
-  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response: AxiosResponse<T> = await this.client.patch(url, data, config)
     return response.data
   }
 }
 
-// Singleton instance
 export const apiClient = new ApiClient()

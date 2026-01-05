@@ -13,9 +13,6 @@ class MovieController extends Controller
         private readonly MovieApiServiceInterface $movieApiService
     ) {}
 
-    /**
-     * Search movies by title
-     */
     public function search(Request $request): JsonResponse
     {
         $request->validate([
@@ -38,9 +35,6 @@ class MovieController extends Controller
         }
     }
 
-    /**
-     * Get movie details
-     */
     public function show(int $id): JsonResponse
     {
         try {
@@ -55,9 +49,6 @@ class MovieController extends Controller
         }
     }
 
-    /**
-     * Get movie genres
-     */
     public function genres(): JsonResponse
     {
         try {
@@ -72,9 +63,6 @@ class MovieController extends Controller
         }
     }
 
-    /**
-     * Get popular movies
-     */
     public function popular(Request $request): JsonResponse
     {
         $request->validate([
@@ -95,9 +83,6 @@ class MovieController extends Controller
         }
     }
 
-    /**
-     * Get now playing movies
-     */
     public function nowPlaying(Request $request): JsonResponse
     {
         $request->validate([
@@ -118,9 +103,6 @@ class MovieController extends Controller
         }
     }
 
-    /**
-     * Get upcoming movies
-     */
     public function upcoming(Request $request): JsonResponse
     {
         $request->validate([
@@ -141,9 +123,6 @@ class MovieController extends Controller
         }
     }
 
-    /**
-     * Get top rated movies
-     */
     public function topRated(Request $request): JsonResponse
     {
         $request->validate([

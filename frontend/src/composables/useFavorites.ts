@@ -1,30 +1,15 @@
 import { ref, computed } from 'vue'
-import axios from 'axios'
 import type { Movie } from '@/types/movie'
+import { favoriteService, type Favorite } from '@/services/favoriteService'
 import { eventBus, AppEvents } from '@/utils/eventBus'
-
-interface Favorite {
-  id: number
-  user_id: number
-  movie_id: number
-  movie_title: string
-  poster_path: string | null
-  overview: string | null
-  vote_average: number | null
-  release_date: string | null
-  genre_ids: number[] | null
-  created_at: string
-  updated_at: string
-}
+import { errorHandler } from '@/utils/errorHandler'
 
 const favorites = ref<Favorite[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 
 export function useFavorites() {
-  const favoriteMovieIds = computed(() => 
-    favorites.value.map(f => f.movie_id)
-  )
+  const favoriteMovieIds = computed(() => favorites.value.map((f) => f.movie_id))
 
   const isFavorite = (movieId: number): boolean => {
     return favoriteMovieIds.value.includes(movieId)
@@ -35,10 +20,12 @@ export function useFavorites() {
     error.value = null
 
     try {
-      const response = await axios.get('/api/favorites')
-      favorites.value = response.data.favorites
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to fetch favorites'
+      favorites.value = await favoriteService.getAll()
+    } catch (err: unknown) {
+      const apiError = err as { response?: { data?: { message?: string } } }
+      const errorMessage = apiError.response?.data?.message || 'Failed to fetch favorites'
+      error.value = errorMessage
+      errorHandler.handle(errorMessage, 'fetchFavorites')
     } finally {
       loading.value = false
     }
@@ -49,25 +36,18 @@ export function useFavorites() {
     error.value = null
 
     try {
-      const response = await axios.post('/api/favorites', {
-        movie_id: movie.id,
-        movie_title: movie.title,
-        poster_path: (movie.poster_path ?? '') as string, 
-        overview: (movie.overview ?? '') as string,
-        vote_average: movie.vote_average,
-        release_date: movie.release_date,
-        genre_ids: movie.genre_ids || [],
-      })
-
-      console.log('➕ Added to favorites:', response.data)
-      favorites.value.push(response.data.favorite || response.data)
+      const favorite = await favoriteService.add(movie)
       
-      // Observer Pattern - Emit event
+      favorites.value.push(favorite)
+
       eventBus.emit(AppEvents.FAVORITE_ADDED, movie)
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to add favorite'
-      eventBus.emit(AppEvents.ERROR_OCCURRED, { message: error.value, context: 'addFavorite' })
-      throw new Error(error.value || 'Failed to add favorite')
+    } catch (err: unknown) {
+      const apiError = err as { response?: { data?: { message?: string } } }
+      const errorMessage = apiError.response?.data?.message || 'Failed to add favorite'
+      error.value = errorMessage
+      errorHandler.handle(errorMessage, 'addFavorite')
+      eventBus.emit(AppEvents.ERROR_OCCURRED, { message: errorMessage, context: 'addFavorite' })
+      throw new Error(errorMessage)
     } finally {
       loading.value = false
     }
@@ -78,15 +58,20 @@ export function useFavorites() {
     error.value = null
 
     try {
-      await axios.delete(`/api/favorites/${movieId}`)
-      favorites.value = favorites.value.filter(f => f.movie_id !== movieId)
-      
-      // Observer Pattern - Emit event
+      await favoriteService.remove(movieId)
+      favorites.value = favorites.value.filter((f) => f.movie_id !== movieId)
+
       eventBus.emit(AppEvents.FAVORITE_REMOVED, { movieId })
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to remove favorite'
-      eventBus.emit(AppEvents.ERROR_OCCURRED, { message: error.value, context: 'removeFavorite' })
-      throw new Error(error.value || 'Failed to remove favorite')
+    } catch (err: unknown) {
+      const apiError = err as { response?: { data?: { message?: string } } }
+      const errorMessage = apiError.response?.data?.message || 'Failed to remove favorite'
+      error.value = errorMessage
+      errorHandler.handle(errorMessage, 'removeFavorite')
+      eventBus.emit(AppEvents.ERROR_OCCURRED, {
+        message: errorMessage,
+        context: 'removeFavorite',
+      })
+      throw new Error(errorMessage)
     } finally {
       loading.value = false
     }

@@ -8,12 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Cors
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Handle preflight OPTIONS request
         if ($request->getMethod() == "OPTIONS") {
             $response = new Response('', 200);
         } else {

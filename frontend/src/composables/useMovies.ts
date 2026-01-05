@@ -3,19 +3,11 @@ import type { Movie, MoviesResponse, Genre } from '@/types/movie'
 import { movieService } from '@/services/movieService'
 import { errorHandler } from '@/utils/errorHandler'
 
-/**
- * Movies Composable
- * Manages movie-related state and operations
- * Following Composition API pattern and Single Responsibility
- */
 export function useMovies() {
   const movies = ref<Movie[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  /**
-   * Base method for handling service calls - DRY principle
-   */
   const handleServiceCall = async <T>(
     serviceCall: () => Promise<T>,
     errorMessage: string,
@@ -101,10 +93,6 @@ export function useMovies() {
   }
 }
 
-/**
- * Genres Composable
- * Manages genre-related state and operations
- */
 export function useGenres() {
   const genres = ref<Genre[]>([])
   const loading = ref(false)

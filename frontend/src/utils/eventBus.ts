@@ -1,49 +1,37 @@
-type EventHandler<T = any> = (data: T) => void
+type EventHandler<T = unknown> = (data: T) => void
 
 class EventBus {
-  private events: Map<string, Set<EventHandler>>
+  private events: Map<string, Set<EventHandler<unknown>>>
 
   constructor() {
     this.events = new Map()
   }
 
-  /**
-   * Subscribe to an event
-   */
-  on<T = any>(event: string, handler: EventHandler<T>): void {
+  on<T = unknown>(event: string, handler: EventHandler<T>): void {
     if (!this.events.has(event)) {
       this.events.set(event, new Set())
     }
-    this.events.get(event)!.add(handler)
+    this.events.get(event)!.add(handler as EventHandler<unknown>)
   }
 
-  /**
-   * Unsubscribe from an event
-   */
-  off<T = any>(event: string, handler: EventHandler<T>): void {
+  off<T = unknown>(event: string, handler: EventHandler<T>): void {
     const handlers = this.events.get(event)
     if (handlers) {
-      handlers.delete(handler)
+      handlers.delete(handler as EventHandler<unknown>)
       if (handlers.size === 0) {
         this.events.delete(event)
       }
     }
   }
 
-  /**
-   * Emit an event
-   */
-  emit<T = any>(event: string, data?: T): void {
+  emit<T = unknown>(event: string, data?: T): void {
     const handlers = this.events.get(event)
     if (handlers) {
       handlers.forEach((handler) => handler(data))
     }
   }
 
-  /**
-   * Subscribe to an event only once
-   */
-  once<T = any>(event: string, handler: EventHandler<T>): void {
+  once<T = unknown>(event: string, handler: EventHandler<T>): void {
     const onceHandler: EventHandler<T> = (data) => {
       handler(data)
       this.off(event, onceHandler)
@@ -51,18 +39,13 @@ class EventBus {
     this.on(event, onceHandler)
   }
 
-  /**
-   * Clear all event listeners
-   */
   clear(): void {
     this.events.clear()
   }
 }
 
-// Singleton instance - Observer Pattern
 export const eventBus = new EventBus()
 
-// Event types for type safety
 export enum AppEvents {
   FAVORITE_ADDED = 'favorite:added',
   FAVORITE_REMOVED = 'favorite:removed',

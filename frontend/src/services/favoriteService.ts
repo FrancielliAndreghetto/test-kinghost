@@ -27,25 +27,14 @@ export interface FavoriteCheckResponse {
   is_favorite: boolean
 }
 
-/**
- * Favorites Service
- * Handles all favorites-related API calls
- * Following Service Pattern and Single Responsibility Principle
- */
 export class FavoriteService {
   private readonly baseUrl = '/favorites'
 
-  /**
-   * Get all user favorites
-   */
   async getAll(): Promise<Favorite[]> {
     const response = await apiClient.get<FavoriteResponse>(this.baseUrl)
     return response.favorites || []
   }
 
-  /**
-   * Add movie to favorites
-   */
   async add(movie: Movie): Promise<Favorite> {
     const payload = {
       movie_id: movie.id,
@@ -61,16 +50,10 @@ export class FavoriteService {
     return response.favorite!
   }
 
-  /**
-   * Remove movie from favorites
-   */
   async remove(movieId: number): Promise<void> {
     await apiClient.delete<FavoriteResponse>(`${this.baseUrl}/${movieId}`)
   }
 
-  /**
-   * Check if movie is in favorites
-   */
   async check(movieId: number): Promise<boolean> {
     const response = await apiClient.get<FavoriteCheckResponse>(
       `${this.baseUrl}/check/${movieId}`,
@@ -79,5 +62,4 @@ export class FavoriteService {
   }
 }
 
-// Singleton instance
 export const favoriteService = new FavoriteService()

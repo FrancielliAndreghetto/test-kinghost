@@ -15,24 +15,18 @@ class AuthService implements AuthServiceInterface
         private readonly UserRepositoryInterface $userRepository
     ) {}
 
-    /**
-     * Register a new user
-     */
     public function register(string $name, string $email, string $password): array
     {
-        // Check if user already exists
         if ($this->userRepository->findByEmail($email)) {
             throw new AuthException('Email already registered', 422);
         }
 
-        // Create user
         $user = $this->userRepository->create([
             'name' => $name,
             'email' => $email,
             'password' => Hash::make($password),
         ]);
 
-        // Generate token
         $token = $user->createToken('api-token')->plainTextToken;
 
         return [
@@ -42,9 +36,6 @@ class AuthService implements AuthServiceInterface
         ];
     }
 
-    /**
-     * Login user and return token
-     */
     public function login(string $email, string $password): array
     {
         $user = $this->userRepository->findByEmail($email);
@@ -53,7 +44,6 @@ class AuthService implements AuthServiceInterface
             throw new AuthException('Invalid credentials', 401);
         }
 
-        // Generate token
         $token = $user->createToken('api-token')->plainTextToken;
 
         return [
@@ -63,17 +53,11 @@ class AuthService implements AuthServiceInterface
         ];
     }
 
-    /**
-     * Get authenticated user
-     */
     public function getAuthenticatedUser()
     {
         return Auth::user();
     }
 
-    /**
-     * Logout user
-     */
     public function logout(): bool
     {
         Auth::user()?->currentAccessToken()?->delete();

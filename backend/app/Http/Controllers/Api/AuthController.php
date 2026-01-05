@@ -15,9 +15,6 @@ class AuthController extends Controller
         private readonly AuthServiceInterface $authService
     ) {}
 
-    /**
-     * Register a new user
-     */
     public function register(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -53,9 +50,6 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Login user
-     */
     public function login(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -89,9 +83,7 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Get authenticated user
-     */
+
     public function me(Request $request): JsonResponse
     {
         return response()->json([
@@ -100,9 +92,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Logout user
-     */
     public function logout(Request $request): JsonResponse
     {
         try {

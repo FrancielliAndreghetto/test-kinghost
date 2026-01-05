@@ -20,17 +20,10 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // HTTP Client
         $this->app->singleton(HttpClientInterface::class, GuzzleHttpClient::class);
-
-        // Movie API Service
         $this->app->singleton(MovieApiServiceInterface::class, TmdbService::class);
-
-        // Repositories
         $this->app->singleton(UserRepositoryInterface::class, EloquentUserRepository::class);
         $this->app->singleton(FavoriteRepositoryInterface::class, EloquentFavoriteRepository::class);
-
-        // Services
         $this->app->singleton(AuthServiceInterface::class, AuthService::class);
         $this->app->singleton(FavoriteServiceInterface::class, FavoriteService::class);
     }
