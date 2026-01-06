@@ -38,11 +38,10 @@ cd test-kinghost
 Copie o arquivo de exemplo e edite com suas configurações:
 
 ```bash
-cd backend
-cp .env.example .env
+cp backend/.env.example backend/.env
 ```
 
-Edite o arquivo `.env` e configure as seguintes variáveis:
+Edite o arquivo `backend/.env` e configure as seguintes variáveis:
 
 ```env
 APP_NAME="Movie Favorites"
