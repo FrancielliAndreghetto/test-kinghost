@@ -39,7 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('favorites')->group(function () {
         Route::get('/', [FavoriteController::class, 'index']);
         Route::post('/', [FavoriteController::class, 'store']);
+        Route::get('/{movieId}/check', [FavoriteController::class, 'check']);
         Route::delete('/{movieId}', [FavoriteController::class, 'destroy']);
-        Route::get('/check/{movieId}', [FavoriteController::class, 'check']);
     });
 });
