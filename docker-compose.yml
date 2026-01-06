@@ -45,6 +45,12 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - king_network
+    command: --default-authentication-plugin=mysql_native_password --skip-log-bin
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:alpine

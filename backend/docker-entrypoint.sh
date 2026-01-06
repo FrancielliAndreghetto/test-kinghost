@@ -22,7 +22,7 @@ until nc -z mysql 3306; do
 done
 
 echo "MySQL port is open, waiting for service to be fully ready..."
-sleep 10
+sleep 5
 
 echo "MySQL is ready. Setting up Laravel..."
 
