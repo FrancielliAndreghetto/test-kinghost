@@ -7,7 +7,7 @@
         </router-link>
 
         <nav class="main-nav" aria-label="Main navigation">
-          <router-link to="/" class="nav-link" active-class="active">Início</router-link>
+          <router-link to="/home" class="nav-link" active-class="active">Início</router-link>
           <router-link to="/favorites" class="nav-link" active-class="active">Favoritos </router-link>
         </nav>
       </div>
@@ -162,6 +162,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', closeDropdown)
+})
+
+// Expor método para limpar busca externamente
+defineExpose({
+  clearSearch
 })
 </script>
 

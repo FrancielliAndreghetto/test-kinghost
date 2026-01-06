@@ -1,6 +1,6 @@
 <template>
   <div class="home-view">
-    <AppHeader @search="handleSearch" />
+    <AppHeader ref="headerRef" @search="handleSearch" />
 
     
 
@@ -218,6 +218,7 @@ const searchLoading = ref(false)
 const currentPage = ref(1)
 const totalPages = ref(1)
 const isLoadingMore = ref(false)
+const headerRef = ref<InstanceType<typeof AppHeader> | null>(null)
 const recommendedPage = ref(1)
 const recommendedTotalPages = ref(1)
 const isLoadingMoreRecommended = ref(false)
@@ -267,7 +268,11 @@ const handleSearch = async (query: string) => {
 
   try {
     const result = await searchMovies(query)
-    displayedSearchResults.value = result.results || movies.value
+    // Filtra apenas filmes válidos (não collections ou outros tipos)
+    const validMovies = (result.results || []).filter(item => 
+      item.media_type !== 'collection' && item.vote_average !== undefined
+    )
+    displayedSearchResults.value = validMovies
     totalPages.value = result.total_pages || 1
     currentPage.value = 1
   } catch (err) {
@@ -285,6 +290,8 @@ const clearSearch = () => {
   searchLoading.value = false
   currentPage.value = 1
   totalPages.value = 1
+  // Limpar o campo de busca no header
+  headerRef.value?.clearSearch()
 }
 
 const loadMoreSearchResults = async () => {
@@ -297,7 +304,11 @@ const loadMoreSearchResults = async () => {
 
   try {
     const result = await searchMovies(currentSearchQuery.value, currentPage.value)
-    displayedSearchResults.value = [...displayedSearchResults.value, ...(result.results || [])]
+    // Filtra apenas filmes válidos (não collections ou outros tipos)
+    const validMovies = (result.results || []).filter(item => 
+      item.media_type !== 'collection' && item.vote_average !== undefined
+    )
+    displayedSearchResults.value = [...displayedSearchResults.value, ...validMovies]
   } catch (err) {
     console.error('Erro ao carregar mais resultados:', err)
   } finally {

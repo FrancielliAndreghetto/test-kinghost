@@ -27,7 +27,7 @@
       <h3 class="card-title">{{ movie.title }}</h3>
 
       <div class="card-meta">
-        <span class="rating">
+        <span class="rating" v-if="movie.vote_average">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"

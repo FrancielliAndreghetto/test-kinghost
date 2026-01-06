@@ -27,7 +27,7 @@ Aplicação web para gerenciamento de filmes favoritos integrada com a API do TM
 ### 1. Clone o repositório
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/FrancielliAndreghetto/test-kinghost.git
 cd test-kinghost
 ```
 
@@ -54,9 +54,9 @@ APP_URL=http://localhost:8080
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=kinghost
-DB_USERNAME=root
-DB_PASSWORD=root
+DB_DATABASE=king_db
+DB_USERNAME=king_user
+DB_PASSWORD=king_password
 
 CACHE_DRIVER=redis
 QUEUE_CONNECTION=redis
@@ -107,6 +107,11 @@ docker-compose exec backend php artisan migrate
 
 ```bash
 docker-compose exec backend php artisan db:seed
+```
+
+```bash
+Email: test@example.com
+Senha: password
 ```
 
 ### 5. Acesse a aplicação

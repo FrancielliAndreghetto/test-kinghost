@@ -24,6 +24,9 @@ sleep 10
 
 echo "MySQL is ready. Setting up Laravel..."
 
+echo "Installing composer dependencies..."
+su -c "composer install --no-interaction --optimize-autoloader"
+
 su -c "composer dump-autoload"
 
 su -c "php artisan migrate --force"
