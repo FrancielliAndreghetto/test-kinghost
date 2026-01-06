@@ -92,7 +92,7 @@ const handleSubmit = async () => {
     await login(form)
     router.push('/')
   } catch (err) {
-    console.error('Login failed:', err)
+    // Erro silencioso
   }
 }
 </script>

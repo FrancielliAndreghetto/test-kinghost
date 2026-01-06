@@ -38,8 +38,6 @@ export function useFavorites() {
     try {
       const favorite = await favoriteService.add(movie)
       
-      console.log('Favorite returned from API:', favorite)
-      
       favorites.value.unshift(favorite)
 
       eventBus.emit(AppEvents.FAVORITE_ADDED, movie)

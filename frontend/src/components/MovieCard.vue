@@ -117,7 +117,6 @@ const closeModal = () => {
 }
 
 const handleWatch = (movieId: number) => {
-  console.log('Watch movie:', movieId)
   closeModal()
 }
 
@@ -125,7 +124,7 @@ const handleToggleFavorite = async () => {
   try {
     await toggleFavorite(props.movie)
   } catch (err) {
-    console.error('Failed to toggle favorite:', err)
+    // Erro silencioso
   }
 }
 </script>

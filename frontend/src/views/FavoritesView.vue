@@ -203,7 +203,6 @@ const handleSearch = async (query: string) => {
       favorite.overview?.toLowerCase().includes(lowerQuery)
     )
   } catch (err) {
-    console.error('Erro ao buscar:', err)
     searchResults.value = []
   } finally {
     searchLoading.value = false
@@ -218,11 +217,10 @@ const clearSearch = () => {
 }
 
 const handleMovieClick = (movieId: number) => {
-  console.log('Movie clicked:', movieId)
+  // Movie clicked
 }
 
 const convertToMovie = (favorite: Favorite): Movie => {
-  console.log('Converting favorite to movie:', favorite.movie_title, 'backdrop_path:', favorite.backdrop_path)
   return {
     id: favorite.movie_id,
     title: favorite.movie_title,

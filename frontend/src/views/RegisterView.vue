@@ -145,7 +145,7 @@ const handleSubmit = async () => {
     await register(form)
     router.push('/')
   } catch (err) {
-    console.error('Registration failed:', err)
+    // Erro silencioso
   }
 }
 </script>

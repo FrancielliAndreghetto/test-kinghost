@@ -17,7 +17,6 @@ class ErrorHandler {
     }
 
     this.errorLog.push(appError)
-    console.error('[ErrorHandler]', appError)
 
     eventBus.emit(AppEvents.ERROR_OCCURRED, appError)
   }

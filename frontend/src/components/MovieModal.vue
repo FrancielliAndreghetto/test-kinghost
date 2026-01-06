@@ -112,9 +112,6 @@ const imageLoading = ref(true)
 watch(() => props.isOpen, (newValue) => {
   if (newValue) {
     imageLoading.value = true
-    console.log('Modal opened - Movie:', props.movie.title)
-    console.log('Backdrop path:', props.movie.backdrop_path)
-    console.log('Backdrop URL:', backdropUrl.value)
   }
 })
 
@@ -141,7 +138,7 @@ const handleToggleFavorite = async () => {
   try {
     await toggleFavorite(props.movie)
   } catch (error) {
-    console.error('Error toggling favorite:', error)
+    // Erro silencioso
   }
 }
 </script>

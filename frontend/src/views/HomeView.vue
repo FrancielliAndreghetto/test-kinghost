@@ -276,7 +276,6 @@ const handleSearch = async (query: string) => {
     totalPages.value = result.total_pages || 1
     currentPage.value = 1
   } catch (err) {
-    console.error('Erro ao buscar:', err)
     displayedSearchResults.value = []
   } finally {
     searchLoading.value = false
@@ -310,7 +309,7 @@ const loadMoreSearchResults = async () => {
     )
     displayedSearchResults.value = [...displayedSearchResults.value, ...validMovies]
   } catch (err) {
-    console.error('Erro ao carregar mais resultados:', err)
+    // Erro silencioso
   } finally {
     isLoadingMore.value = false
   }
@@ -342,22 +341,22 @@ const loadMoreRecommended = async () => {
     allTopRatedMovies.value = [...allTopRatedMovies.value, ...(result.results || [])]
     topRatedMovies.value = [...topRatedMovies.value, ...(result.results || [])]
   } catch (err) {
-    console.error('Erro ao carregar mais filmes recomendados:', err)
+    // Erro silencioso
   } finally {
     isLoadingMoreRecommended.value = false
   }
 }
 
 const handleMovieClick = (movieId: number) => {
-  console.log('Movie clicked:', movieId)
+  // Movie clicked
 }
 
 const handleWatch = (movieId: number) => {
-  console.log('Watch movie:', movieId)
+  // Watch movie
 }
 
 const handleAddToList = (movieId: number) => {
-  console.log('Add to list:', movieId)
+  // Add to list
 }
 
 onMounted(async () => {
@@ -380,7 +379,7 @@ onMounted(async () => {
     // Adicionar event listener para scroll infinito
     window.addEventListener('scroll', handleScroll)
   } catch (err) {
-    console.error('Erro ao carregar filmes:', err)
+    // Erro silencioso
   }
 })
 
