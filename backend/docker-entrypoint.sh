@@ -28,7 +28,7 @@ echo "MySQL is ready. Setting up Laravel..."
 
 if [ ! -d "vendor" ]; then
     echo "Installing composer dependencies..."
-    composer install --no-interaction --optimize-autoloader --no-dev
+    composer install --no-interaction --optimize-autoloader
 fi
 
 if [ -f "artisan" ]; then
