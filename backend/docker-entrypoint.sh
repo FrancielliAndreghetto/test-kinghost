@@ -3,14 +3,16 @@ set -e
 
 echo "Starting Laravel setup..."
 
-mkdir -p /var/www/html/storage/logs
-mkdir -p /var/www/html/storage/framework/cache
-mkdir -p /var/www/html/storage/framework/sessions
-mkdir -p /var/www/html/storage/framework/views
-mkdir -p /var/www/html/bootstrap/cache
+cd /var/www/html
 
-chmod -R 777 /var/www/html/storage
-chmod -R 777 /var/www/html/bootstrap/cache
+mkdir -p storage/logs
+mkdir -p storage/framework/cache
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p bootstrap/cache
+
+chmod -R 777 storage
+chmod -R 777 bootstrap/cache
 
 echo "Waiting for MySQL to be ready..."
 
@@ -24,17 +26,16 @@ sleep 10
 
 echo "MySQL is ready. Setting up Laravel..."
 
-echo "Installing composer dependencies..."
-su -c "composer install --no-interaction --optimize-autoloader"
+if [ ! -d "vendor" ]; then
+    echo "Installing composer dependencies..."
+    composer install --no-interaction --optimize-autoloader --no-dev
+fi
 
-su -c "composer dump-autoload"
-
-su -c "php artisan migrate --force"
-su -c "php artisan db:seed --force" || echo "Seed already executed or failed, continuing..."
-
-su -c "php artisan config:clear"
-su -c "php artisan route:clear"
-su -c "php artisan cache:clear"
+if [ -f "artisan" ]; then
+    php artisan config:clear
+    php artisan route:clear
+    php artisan cache:clear
+fi
 
 echo "Laravel setup complete. Starting background services..."
 

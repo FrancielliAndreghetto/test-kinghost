@@ -88,7 +88,11 @@ docker-compose up -d --build
 
 Aguarde a construção das imagens e inicialização dos containers. Este processo pode levar alguns minutos na primeira execução.
 
+**Nota:** O `composer install` é executado automaticamente pelo container do backend durante a inicialização.
+
 ### 4. Configure a aplicação Laravel
+
+Aguarde aproximadamente 30 segundos para o MySQL inicializar completamente, então execute:
 
 #### 4.1. Gere a chave da aplicação
 
